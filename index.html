@@ -1,0 +1,58 @@
+<style>
+
+#main > * {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#inputbox {
+    margin-top: 1ex;
+    margin-bottom: 1ex;
+    width: 50%;
+    border-radius: 20px;
+    font-size: 100px;
+    padding: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.noanswer {
+    border: solid rgb(20, 61, 102) 5pt;
+    background-color: rgb(51, 153, 255);
+}
+
+.incorrect {
+    border: solid rgb(102, 30, 0) 5pt;
+    background-color: rgb(255, 50, 50);
+}
+
+.correct {
+    border: solid rgb(30, 102, 0) 5pt;
+    background-color: rgb(71, 209, 71);
+}
+
+</style>
+
+<div id="main">
+    <div id="inputbox" class="incorrect" ontextinput="checkBox();" contenteditable></div>
+</div>
+
+<script>
+function checkBox(event) {
+    if (!event)
+        var event = window.event;
+    if (event.target)
+        var target = event.target;
+    else if (e.srcElement)
+        var target = event.srcElement;
+
+    if (target.innerText == "abcd") {
+        target.className = "correct";
+    } else {
+        target.className = "incorrect";
+    }
+}
+
+document.getElementById("inputbox").addEventListener("keyup", checkBox, false);
+</script>
+

@@ -1,16 +1,27 @@
 <head>
     <meta charset="utf-8"/>
     <script type="text/javascript" src="data.json" charset="utf-8"></script>
+    <link href='https://fonts.googleapis.com/css?family=Fjalla+One&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
     <style>
+    body {
+        background: url(img/background.jpg), black;
+        font-family: "Fjalla One", san-serif;
+        color: white;
+    }
+
     #main > * {
         margin-left: auto;
         margin-right: auto;
     }
 
-    #inputbox-container {
-        margin-top: 1ex;
-        margin-bottom: 1ex;
-        width: 50%;
+    #word {
+        font-size: 6vw;
+        text-align: center;
+    }
+
+    #conjugation {
+        font-size: 2vw;
+        text-align: center;
     }
 
     .wordbox {
@@ -21,6 +32,8 @@
 
     #inputbox {
         border-radius: 20px;
+        margin-top: 1ex;
+        margin-bottom: 0.5ex;
         padding: 5px;
         padding-left: 20px;
         padding-right: 20px;
@@ -29,7 +42,7 @@
     #answerbox {
         font-style: italic;
         text-align: right;
-        color: gray;
+        color: lightgray;
     }
 
     @keyframes entered {
@@ -69,14 +82,14 @@
 
 <body>
     <div id="main">
-        <div id="word">none</div>
+        <div id="word"></div>
         <div id="conjugation">none</div>
         <div id="inputbox" class="wordbox noanswer" contenteditable></div>
-        <div id="answerbox" class="wordbox" contenteditable>hello...</div>
+        <div id="answerbox" class="wordbox"></div>
     </div>
 
     <script>
-    function chooseNewConjugation() {
+    function generateRandomConjugationTest() {
         var conjugations = [
             "Present",
             "Future",
@@ -98,28 +111,57 @@
             "Negative Imperative",
         ]
         var tenses = [ "yo", "tú", "él/ella/Ud.", "nosotros", "vosotros", "ellos/ellas/Uds." ];
-
         var keys = Object.keys(__WORDS__);
-        var word = keys[Math.floor(Math.random() * keys.length)];
-        document.getElementById('word').innerText = word;
-
-        var wordArray = __WORDS__[word];
+        var verb = keys[Math.floor(Math.random() * keys.length)];
+        var verbArray = __WORDS__[verb];
         var conjugationIndex = Math.floor(Math.random() * conjugations.length)
         var tenseIndex = Math.floor(Math.random() * tenses.length)
+
+        return {
+            verb: verb,
+            conjugatedVerb: verbArray[(conjugationIndex * 6) + tenseIndex],
+            conjugationText: conjugations[conjugationIndex],
+            tenseText: tenses[tenseIndex],
+        }
+    }
+
+    function chooseNewConjugation() {
+        var conjugationTest = generateRandomConjugationTest();
+        while (conjugationTest.answer == '') {
+            conjugationTest = generateRandomConjugationTest();
+        }
+
+        document.getElementById('word').innerText = conjugationTest.verb;
         document.getElementById('conjugation').innerText =
-            conjugations[conjugationIndex] + "  /  " + tenses[tenseIndex];
-        window.__ANSWER__ = wordArray[(conjugationIndex * 6) + tenseIndex];
-        console.log(__ANSWER__);
+            conjugationTest.conjugationText + "  +  " + conjugationTest.tenseText;
+        window.__ANSWER__ = conjugationTest.conjugatedVerb;
+        console.log(conjugationTest.conjugatedVerb);
 
         var inputBox = document.getElementById('inputbox');
         inputBox.innerText = "";
         inputBox.style.display = "";
         inputBox.className = "wordbox noanswer";
+        inputBox.focus();
 
         var answerBox = document.getElementById('answerbox');
         answerBox.innerText = "";
 
         inTestingMode = true;
+    }
+
+    function checkConjugation() {
+        var inputBox = document.getElementById('inputbox');
+        var answerBox = document.getElementById('answerbox');
+
+        if (inputBox.innerText == __ANSWER__)
+            inputBox.className = "wordbox correct phaseout";
+        else {
+            inputBox.className = "wordbox incorrect phaseout";
+            answerBox.innerText = __ANSWER__;
+        }
+        inputBox.blur();
+
+        inTestingMode = false;
     }
 
     function getEvent(event) {
@@ -141,28 +183,22 @@
         var event = getEvent(event);
         if (event.keyCode == 13) {
             event.preventDefault();
+            event.stopPropagation();
 
             if (inTestingMode) {
-                var inputBox = document.getElementById('inputbox');
-                if (inputBox.innerText == __ANSWER__)
-                    inputBox.className = "wordbox correct phaseout";
-                else {
-                    inputBox.className = "wordbox incorrect phaseout";
-                    document.getElementById('answerbox').innerText = __ANSWER__;
-                }
-                inTestingMode = false;
+                checkConjugation();
             } else {
                 chooseNewConjugation();
-                inTestingMode = true;
             }
         }
+
+        return false;
     }
 
-    chooseNewConjugation();
-
     var inputBox = document.getElementById('inputbox');
-    inputBox.focus();
     inputBox.addEventListener("keypress", keyPress, false);
+    document.body.addEventListener("keypress", keyPress, false);
 
+    chooseNewConjugation();
     </script>
 </body>

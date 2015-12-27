@@ -28,12 +28,15 @@ indices = [
 
 with open(sys.argv[1], 'r') as csv_file:
     reader = csv.reader(csv_file)
-    words = collections.defaultdict(lambda: [""] * len(indices) * 6)
+    words = collections.defaultdict(lambda: [""] * ((len(indices) * 6) + 1))
 
     next(reader) # Skip the header.
     for row in reader:
         offset = indices.index(row[2] + "-" + row[4]) * 6
         for index in range(0, 6):
-            words[row[0]][offset + index] = row[7 + index]
+            words[row[0]][offset + index + 1] = row[7 + index]
 
-print("__WORDS__ = " + json.dumps(words, ensure_ascii=False))
+        # Add the definition as the first member of the data array.
+        words[row[0]][0] = row[1]
+
+print("__WORDS__ = " + json.dumps(words, ensure_ascii=False, indent=True))

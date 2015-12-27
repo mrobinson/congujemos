@@ -19,8 +19,14 @@
         text-align: center;
     }
 
+    #definition {
+        font-size: 1.5vw;
+        text-align: center;
+    }
+
     #conjugation {
-        font-size: 2vw;
+        margin-top: 1ex;
+        font-size: 4vw;
         text-align: center;
     }
 
@@ -32,17 +38,18 @@
 
     #inputbox {
         border-radius: 20px;
-        margin-top: 1ex;
-        margin-bottom: 0.5ex;
+        margin-top: 0.2ex;
+        margin-bottom: 0.1ex;
         padding: 5px;
         padding-left: 20px;
         padding-right: 20px;
     }
 
     #answerbox {
+        color: lightgray;
         font-style: italic;
         text-align: right;
-        color: lightgray;
+        text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
     }
 
     @keyframes entered {
@@ -83,6 +90,7 @@
 <body>
     <div id="main">
         <div id="word"></div>
+        <div id="definition"></div>
         <div id="conjugation">none</div>
         <div id="inputbox" class="wordbox noanswer" contenteditable></div>
         <div id="answerbox" class="wordbox"></div>
@@ -128,8 +136,9 @@
 
         return {
             verb: verb,
-            conjugatedVerb: verbArray[(__MOODS_AND_TENSES__[moodAndTenseIndex][0] * 6) +
-                                      __PERSON_AND_NUMBER__[personAndNumberIndex][0]],
+            definition: verbArray[0],
+            conjugatedVerb: verbArray[1 + (__MOODS_AND_TENSES__[moodAndTenseIndex][0] * 6) +
+                                          __PERSON_AND_NUMBER__[personAndNumberIndex][0]],
             moodAndTenseText: __MOODS_AND_TENSES__[moodAndTenseIndex][1],
             personAndNumberText: __PERSON_AND_NUMBER__[personAndNumberIndex][1],
         }
@@ -142,6 +151,7 @@
         }
 
         document.getElementById('word').innerText = conjugationTest.verb;
+        document.getElementById('definition').innerText = "(" + conjugationTest.definition + ")";
         document.getElementById('conjugation').innerText =
             conjugationTest.moodAndTenseText + "  +  " + conjugationTest.personAndNumberText;
         window.__ANSWER__ = conjugationTest.conjugatedVerb;

@@ -89,39 +89,49 @@
     </div>
 
     <script>
+    var __MOODS_AND_TENSES__ = [
+        [0, "Present"],
+        [1, "Future"],
+        [2, "Imperfect"],
+        [3, "Preterite"],
+        [4, "Conditional"],
+        [5, "Present Perfect"],
+        [6, "Future Perfect"],
+        [7, "Past Perfect"],
+        // [8, "Preterite (Archaic)"],
+        [9, "Conditional Perfect"],
+        [10, "Present Subjunctive"],
+        [11, "Imperfect Subjunctive"],
+        [12, "Future Subjunctive"],
+        [13, "Present Perfect Subjunctive"],
+        [14, "Future Perfect Subjunctive"],
+        [15, "Past Perfect Subjuntive"],
+        [16, "Affirmative Imperative"],
+        [17, "Negative Imperative"],
+    ];
+
+    var __PERSON_AND_NUMBER__ = [
+        [0, "yo"],
+        [1, "tú"],
+        [2, "él/ella/usted"],
+        [3, "nosotros"],
+        [4, "vosotros"],
+        [5, "ellos/ellas/ustedes" ],
+    ];
+
     function generateRandomConjugationTest() {
-        var conjugations = [
-            "Present",
-            "Future",
-            "Imperfect",
-            "Preterite",
-            "Conditional",
-            "Present Perfect",
-            "Future Perfect",
-            "Past Perfect",
-            "Preterite (Archaic)",
-            "Conditional Perfect",
-            "Present Subjunctive",
-            "Imperfect Subjunctive",
-            "Future Subjunctive",
-            "Present Perfect Subjunctive",
-            "Future Perfect Subjunctive",
-            "Past Perfect Subjuntive",
-            "Affirmative Imperative",
-            "Negative Imperative",
-        ]
-        var tenses = [ "yo", "tú", "él/ella/Ud.", "nosotros", "vosotros", "ellos/ellas/Uds." ];
         var keys = Object.keys(__WORDS__);
         var verb = keys[Math.floor(Math.random() * keys.length)];
         var verbArray = __WORDS__[verb];
-        var conjugationIndex = Math.floor(Math.random() * conjugations.length)
-        var tenseIndex = Math.floor(Math.random() * tenses.length)
+        var moodAndTenseIndex = Math.floor(Math.random() * __MOODS_AND_TENSES__.length);
+        var personAndNumberIndex = Math.floor(Math.random() * __PERSON_AND_NUMBER__.length);
 
         return {
             verb: verb,
-            conjugatedVerb: verbArray[(conjugationIndex * 6) + tenseIndex],
-            conjugationText: conjugations[conjugationIndex],
-            tenseText: tenses[tenseIndex],
+            conjugatedVerb: verbArray[(__MOODS_AND_TENSES__[moodAndTenseIndex][0] * 6) +
+                                      __PERSON_AND_NUMBER__[personAndNumberIndex][0]],
+            moodAndTenseText: __MOODS_AND_TENSES__[moodAndTenseIndex][1],
+            personAndNumberText: __PERSON_AND_NUMBER__[personAndNumberIndex][1],
         }
     }
 
@@ -133,7 +143,7 @@
 
         document.getElementById('word').innerText = conjugationTest.verb;
         document.getElementById('conjugation').innerText =
-            conjugationTest.conjugationText + "  +  " + conjugationTest.tenseText;
+            conjugationTest.moodAndTenseText + "  +  " + conjugationTest.personAndNumberText;
         window.__ANSWER__ = conjugationTest.conjugatedVerb;
         console.log(conjugationTest.conjugatedVerb);
 

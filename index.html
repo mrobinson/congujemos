@@ -1,58 +1,168 @@
-<style>
-
-#main > * {
-    margin-left: auto;
-    margin-right: auto;
-}
-
-#inputbox {
-    margin-top: 1ex;
-    margin-bottom: 1ex;
-    width: 50%;
-    border-radius: 20px;
-    font-size: 100px;
-    padding: 5px;
-    padding-left: 20px;
-    padding-right: 20px;
-}
-
-.noanswer {
-    border: solid rgb(20, 61, 102) 5pt;
-    background-color: rgb(51, 153, 255);
-}
-
-.incorrect {
-    border: solid rgb(102, 30, 0) 5pt;
-    background-color: rgb(255, 50, 50);
-}
-
-.correct {
-    border: solid rgb(30, 102, 0) 5pt;
-    background-color: rgb(71, 209, 71);
-}
-
-</style>
-
-<div id="main">
-    <div id="inputbox" class="incorrect" ontextinput="checkBox();" contenteditable></div>
-</div>
-
-<script>
-function checkBox(event) {
-    if (!event)
-        var event = window.event;
-    if (event.target)
-        var target = event.target;
-    else if (e.srcElement)
-        var target = event.srcElement;
-
-    if (target.innerText == "abcd") {
-        target.className = "correct";
-    } else {
-        target.className = "incorrect";
+<head>
+    <meta charset="utf-8"/>
+    <script type="text/javascript" src="data.json" charset="utf-8"></script>
+    <style>
+    #main > * {
+        margin-left: auto;
+        margin-right: auto;
     }
-}
 
-document.getElementById("inputbox").addEventListener("keyup", checkBox, false);
-</script>
+    #inputbox-container {
+        margin-top: 1ex;
+        margin-bottom: 1ex;
+        width: 50%;
+    }
 
+    .wordbox {
+        font-size: 6vw;
+        width: 20ex;
+        outline: none;
+    }
+
+    #inputbox {
+        border-radius: 20px;
+        padding: 5px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    #answerbox {
+        font-style: italic;
+        text-align: right;
+        color: gray;
+    }
+
+    @keyframes entered {
+        0% {
+            transform: scale(1.0);
+        }
+
+        100% {
+            transform: scale(1.01);
+        }
+    }
+
+    .phaseout {
+        animation-name: entered;
+        animation-duration: 0.1s;
+        animation-direction: alternate;
+        animation-timing-function: ease;
+    }
+
+    .noanswer {
+        border: solid rgb(20, 61, 102) 5pt;
+        background-color: rgb(51, 153, 255);
+    }
+
+    .incorrect {
+        border: solid rgb(102, 30, 0) 5pt;
+        background-color: rgb(255, 50, 50);
+    }
+
+    .correct {
+        border: solid rgb(30, 102, 0) 5pt;
+        background-color: rgb(71, 209, 71);
+    }
+
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <div id="word">none</div>
+        <div id="conjugation">none</div>
+        <div id="inputbox" class="wordbox noanswer" contenteditable></div>
+        <div id="answerbox" class="wordbox" contenteditable>hello...</div>
+    </div>
+
+    <script>
+    function chooseNewConjugation() {
+        var conjugations = [
+            "Present",
+            "Future",
+            "Imperfect",
+            "Preterite",
+            "Conditional",
+            "Present Perfect",
+            "Future Perfect",
+            "Past Perfect",
+            "Preterite (Archaic)",
+            "Conditional Perfect",
+            "Present Subjunctive",
+            "Imperfect Subjunctive",
+            "Future Subjunctive",
+            "Present Perfect Subjunctive",
+            "Future Perfect Subjunctive",
+            "Past Perfect Subjuntive",
+            "Affirmative Imperative",
+            "Negative Imperative",
+        ]
+        var tenses = [ "yo", "tú", "él/ella/Ud.", "nosotros", "vosotros", "ellos/ellas/Uds." ];
+
+        var keys = Object.keys(__WORDS__);
+        var word = keys[Math.floor(Math.random() * keys.length)];
+        document.getElementById('word').innerText = word;
+
+        var wordArray = __WORDS__[word];
+        var conjugationIndex = Math.floor(Math.random() * conjugations.length)
+        var tenseIndex = Math.floor(Math.random() * tenses.length)
+        document.getElementById('conjugation').innerText =
+            conjugations[conjugationIndex] + "  /  " + tenses[tenseIndex];
+        window.__ANSWER__ = wordArray[(conjugationIndex * 6) + tenseIndex];
+        console.log(__ANSWER__);
+
+        var inputBox = document.getElementById('inputbox');
+        inputBox.innerText = "";
+        inputBox.style.display = "";
+        inputBox.className = "wordbox noanswer";
+
+        var answerBox = document.getElementById('answerbox');
+        answerBox.innerText = "";
+
+        inTestingMode = true;
+    }
+
+    function getEvent(event) {
+        if (!event)
+            return window.event;
+        return event;
+    }
+
+    function getEventTarget(event) {
+        var event = getEvent(event);
+        if (event.target)
+            return event.target;
+        else if (event.srcElement)
+            return event.srcElement;
+        return null;
+    }
+
+    function keyPress(event) {
+        var event = getEvent(event);
+        if (event.keyCode == 13) {
+            event.preventDefault();
+
+            if (inTestingMode) {
+                var inputBox = document.getElementById('inputbox');
+                if (inputBox.innerText == __ANSWER__)
+                    inputBox.className = "wordbox correct phaseout";
+                else {
+                    inputBox.className = "wordbox incorrect phaseout";
+                    document.getElementById('answerbox').innerText = __ANSWER__;
+                }
+                inTestingMode = false;
+            } else {
+                chooseNewConjugation();
+                inTestingMode = true;
+            }
+        }
+    }
+
+    chooseNewConjugation();
+
+    var inputBox = document.getElementById('inputbox');
+    inputBox.focus();
+    inputBox.addEventListener("keypress", keyPress, false);
+
+    </script>
+</body>

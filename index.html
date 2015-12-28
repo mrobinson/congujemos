@@ -9,36 +9,32 @@
         color: white;
     }
 
-    #main > * {
+    body {
+        margin-top: 5vh;
+        margin-left: 5vw;
+        margin-right: 5vw;
+    }
+
+    #main {
         margin-left: auto;
         margin-right: auto;
     }
 
-    #word {
-        font-size: 6vw;
-        text-align: center;
-    }
-
-    #definition {
-        font-size: 1.5vw;
-        text-align: center;
-    }
-
+    #word { font-size: 6vw; }
+    #definition { font-size: 1.5vw; }
     #conjugation {
-        margin-top: 1ex;
         font-size: 4vw;
-        text-align: center;
+        text-align: right;
     }
 
     .wordbox {
         font-size: 6vw;
-        width: 20ex;
         outline: none;
     }
 
     #inputbox {
         border-radius: 20px;
-        margin-top: 0.2ex;
+        margin-top: 1ex;
         margin-bottom: 0.1ex;
         padding: 5px;
         padding-left: 20px;
@@ -99,9 +95,12 @@
 
 <body>
     <div id="main">
-        <div id="word"></div>
-        <div id="definition"></div>
-        <div id="conjugation">none</div>
+        <div style="float: left">
+            <div id="word"></div>
+            <div id="definition"></div>
+        </div>
+        <div style="float: right;" id="conjugation">none</div>
+        <div style="clear: both;"></div>
         <div id="inputbox" class="wordbox noanswer" contenteditable></div>
         <div id="answerbox" class="wordbox"></div>
 
@@ -162,14 +161,14 @@
 
     function chooseNewConjugation() {
         var conjugationTest = generateRandomConjugationTest();
-        while (conjugationTest.answer == '') {
+        while (conjugationTest.conjugatedVerb == '') {
             conjugationTest = generateRandomConjugationTest();
         }
 
         document.getElementById('word').innerText = conjugationTest.verb;
         document.getElementById('definition').innerText = "(" + conjugationTest.definition + ")";
-        document.getElementById('conjugation').innerText =
-            conjugationTest.moodAndTenseText + "  +  " + conjugationTest.personAndNumberText;
+        document.getElementById('conjugation').innerHTML = conjugationTest.moodAndTenseText + 
+            "<br/>in the " + conjugationTest.personAndNumberText + " form";
         window.__ANSWER__ = conjugationTest.conjugatedVerb;
         console.log(conjugationTest.conjugatedVerb);
 
@@ -177,10 +176,12 @@
         inputBox.innerText = "";
         inputBox.style.display = "";
         inputBox.className = "wordbox noanswer";
+        inputBox.setAttribute('contenteditable', 'true');
         inputBox.focus();
 
         var answerBox = document.getElementById('answerbox');
-        answerBox.innerText = "";
+        answerBox.innerText = "blank";
+        answerBox.style.visibility = "hidden";
 
         inTestingMode = true;
     }
@@ -194,8 +195,9 @@
         else {
             inputBox.className = "wordbox incorrect phaseout";
             answerBox.innerText = __ANSWER__;
+            answerBox.style.visibility = "";
         }
-        inputBox.blur();
+        inputBox.removeAttribute('contenteditable');
 
         inTestingMode = false;
     }

@@ -52,6 +52,16 @@
         text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
     }
 
+    #hearts {
+        margin-top: 1ex;
+        text-align: right;
+    }
+
+    .heart {
+        width: 15vh;
+        height: 15vh;
+    }
+
     @keyframes entered {
         0% {
             transform: scale(1.0);
@@ -94,6 +104,12 @@
         <div id="conjugation">none</div>
         <div id="inputbox" class="wordbox noanswer" contenteditable></div>
         <div id="answerbox" class="wordbox"></div>
+
+        <div id="hearts">
+            <img src="img/heart.svg" class="heart"/>
+            <img src="img/heart.svg" class="heart"/>
+            <img src="img/heart.svg" class="heart"/>
+        </div>
     </div>
 
     <script>

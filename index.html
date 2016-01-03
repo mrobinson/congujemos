@@ -33,12 +33,13 @@
     }
 
     #inputbox {
-        border-radius: 20px;
+        border-radius: 0.5ex;
         margin-top: 1ex;
         margin-bottom: 0.1ex;
-        padding: 5px;
-        padding-left: 20px;
-        padding-right: 20px;
+        padding: 0.2ex;
+        padding-left: 0.4ex;
+        padding-right: 0.4ex;
+        min-height: 2ex;
     }
 
     #answerbox {
@@ -109,9 +110,48 @@
             <img src="img/heart.svg" class="heart"/>
             <img src="img/heart.svg" class="heart"/>
         </div>
+
+        <div id="timer" style="width: 300px; height: 20px; border: solid black 3px;">
+            <div id="timerguts" style="width: 50%; height: 100%; background: pink;"></div>
+        </div>
     </div>
 
     <script>
+    // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+    // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+    // requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
+    // MIT license
+    (function() {
+        var lastTime = 0;
+        var vendors = ['ms', 'moz', 'webkit', 'o'];
+        for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+            window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+            window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
+                                       || window[vendors[x]+'CancelRequestAnimationFrame'];
+        }
+
+        if (!window.requestAnimationFrame)
+            window.requestAnimationFrame = function(callback, element) {
+                var currTime = new Date().getTime();
+                var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+                var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+                  timeToCall);
+                lastTime = currTime + timeToCall;
+                return id;
+            };
+
+        if (!window.cancelAnimationFrame)
+            window.cancelAnimationFrame = function(id) {
+                clearTimeout(id);
+            };
+    }());
+    </script>
+
+    <script>
+    var __TIMEOUT__ = 5 * 1000; // 5 seconds
+    var __ANIMATION_FRAME__ = null;
+    var __ANIMATION_START__ = null;
+
     var __MOODS_AND_TENSES__ = [
         [0, "Present", "Indicative"],
         [1, "Future", "Indicative"],
@@ -160,6 +200,39 @@
         }
     }
 
+    function startTesting() {
+        if (__ANIMATION_FRAME__ !== null)
+            cancelAnimationFrame(__ANIMATION_FRAME__);
+
+        var animationFrameFunction = function(timestamp) {
+            if (__ANIMATION_START__ == null) {
+                __ANIMATION_START__ = timestamp;
+            }
+
+            var percentDone =
+                Math.min(((timestamp - __ANIMATION_START__) / __TIMEOUT__) * 100, 100);
+            document.getElementById('timerguts').style.width = (100 - percentDone) + "%";
+
+            if (percentDone == 100) {
+                checkConjugation();
+                return;
+            }
+
+            __ANIMATION_FRAME__ = requestAnimationFrame(animationFrameFunction);
+
+        };
+
+        __ANIMATION_START__ = null;
+        __ANIMATION_FRAME__ = requestAnimationFrame(animationFrameFunction);
+        inTestingMode = true;
+    }
+
+    function stopTesting() {
+        if (__ANIMATION_FRAME__ !== null)
+            cancelAnimationFrame(__ANIMATION_FRAME__);
+        inTestingMode = false;
+    }
+
     function chooseNewConjugation() {
         var conjugationTest = generateRandomConjugationTest();
         while (conjugationTest.conjugatedVerb == '') {
@@ -186,7 +259,7 @@
         answerBox.innerText = "blank";
         answerBox.style.visibility = "hidden";
 
-        inTestingMode = true;
+        startTesting();
     }
 
     function checkConjugation() {
@@ -202,7 +275,7 @@
         }
         inputBox.removeAttribute('contenteditable');
 
-        inTestingMode = false;
+        stopTesting();
     }
 
     function getEvent(event) {

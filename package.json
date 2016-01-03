@@ -1,0 +1,10 @@
+{
+  "name": "conjuguemos",
+  "version": "0.0.1",
+  "devDependencies": {
+    "babel-cli": "^6.0.0"
+  },
+  "scripts": {
+    "build": "babel src -d lib"
+  }
+}

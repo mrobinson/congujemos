@@ -34,9 +34,17 @@ with open(sys.argv[1], 'r') as csv_file:
     for row in reader:
         offset = indices.index(row[2] + "-" + row[4]) * 6
         for index in range(0, 6):
-            words[row[0]][offset + index + 1] = row[7 + index]
+            # The imperative forms are in a very strange order. Correct
+            # that here.
+            if (offset == 16*6 or offset == 17*6) and index == 2:
+               target = 7 + 4
+            elif (offset == 16*6 or offset == 17*6) and index == 4:
+               target = 7 + 2
+            else:
+               target = 7 + index
+            words[row[0]][offset + index + 1] = row[target]
 
         # Add the definition as the first member of the data array.
         words[row[0]][0] = row[1]
 
-print("__WORDS__ = " + json.dumps(words, ensure_ascii=False, indent=True))
+print("__WORDS__ = " + json.dumps(words, ensure_ascii=False, indent=True, sort_keys=True))

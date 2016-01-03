@@ -113,24 +113,24 @@
 
     <script>
     var __MOODS_AND_TENSES__ = [
-        [0, "Present"],
-        [1, "Future"],
-        [2, "Imperfect"],
-        [3, "Preterite"],
-        [4, "Conditional"],
-        [5, "Present Perfect"],
-        [6, "Future Perfect"],
-        [7, "Past Perfect"],
-        // [8, "Preterite (Archaic)"],
-        [9, "Conditional Perfect"],
-        [10, "Present Subjunctive"],
-        [11, "Imperfect Subjunctive"],
-        [12, "Future Subjunctive"],
-        [13, "Present Perfect Subjunctive"],
-        [14, "Future Perfect Subjunctive"],
-        [15, "Past Perfect Subjuntive"],
-        [16, "Affirmative Imperative"],
-        [17, "Negative Imperative"],
+        [0, "Present", "Indicative"],
+        [1, "Future", "Indicative"],
+        [2, "Imperfect", "Indicative"],
+        [3, "Preterite", "Indicative"],
+        [4, "Conditional", "Indicative"],
+        [5, "Present Perfect", "Indicative"],
+        [6, "Future Perfect", "Indicative"],
+        [7, "Past Perfect", "Indicative"],
+        // [8, "Preterite (Archaic)", "Indicative"],
+        [9, "Conditional Perfect", "Indicative"],
+        [10, "Present", "Subjunctive"],
+        [11, "Imperfect", "Subjunctive"],
+        [12, "Future", "Subjunctive"],
+        [13, "Present Perfect", "Subjunctive"],
+        [14, "Future Perfect", "Subjunctive"],
+        [15, "Past Perfect", "Subjuntive"],
+        [16, "Affirmative", "Imperative"],
+        [17, "Negative", "Imperative"],
     ];
 
     var __PERSON_AND_NUMBER__ = [
@@ -154,7 +154,8 @@
             definition: verbArray[0],
             conjugatedVerb: verbArray[1 + (__MOODS_AND_TENSES__[moodAndTenseIndex][0] * 6) +
                                           __PERSON_AND_NUMBER__[personAndNumberIndex][0]],
-            moodAndTenseText: __MOODS_AND_TENSES__[moodAndTenseIndex][1],
+            tense: __MOODS_AND_TENSES__[moodAndTenseIndex][1],
+            mood: __MOODS_AND_TENSES__[moodAndTenseIndex][2],
             personAndNumberText: __PERSON_AND_NUMBER__[personAndNumberIndex][1],
         }
     }
@@ -167,7 +168,9 @@
 
         document.getElementById('word').innerText = conjugationTest.verb;
         document.getElementById('definition').innerText = "(" + conjugationTest.definition + ")";
-        document.getElementById('conjugation').innerHTML = conjugationTest.moodAndTenseText + 
+        document.getElementById('conjugation').innerHTML =
+            conjugationTest.tense +
+            "<br/>" + conjugationTest.mood +
             "<br/>in the " + conjugationTest.personAndNumberText + " form";
         window.__ANSWER__ = conjugationTest.conjugatedVerb;
         console.log(conjugationTest.conjugatedVerb);

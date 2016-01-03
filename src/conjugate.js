@@ -1,4 +1,27 @@
 class Conjugate {
+    constructor(inputBoxElement,
+                correctAnswerBoxElement,
+                wordElement,
+                definitionElement,
+                conjugationTextElement,
+                timerFillElement) {
+
+        this.inputBoxElement = inputBoxElement;
+        this.correctAnswerBoxElement = correctAnswerBoxElement;
+        this.wordElement = wordElement;
+        this.definitionElement = definitionElement;
+        this.conjugationTextElement = conjugationTextElement;
+        this.timerFillElement = timerFillElement
+
+        this.inTestingMode = false;
+        this.animationFrame = null;
+        this.animationStart = null;
+
+        var keyHandler = this.keyPress.bind(this);
+        this.inputBoxElement.addEventListener("keypress", keyHandler, false);
+        document.body.addEventListener("keypress", keyHandler, false);
+    }
+
     static generateRandomConjugationTest() {
         var keys = Object.keys(__WORDS__);
         var verb = keys[Math.floor(Math.random() * keys.length)];
@@ -17,82 +40,79 @@ class Conjugate {
         }
     }
 
-    static startTesting() {
-        if (Conjugate.animationFrame !== null)
-            cancelAnimationFrame(Conjugate.animationFrame);
+    startTesting() {
+        if (this.animationFrame !== null)
+            cancelAnimationFrame(this.animationFrame);
 
-        var animationFrameFunction = function(timestamp) {
-            if (Conjugate.animationStart == null) {
-                Conjugate.animationStart = timestamp;
+        this.animationHandler = function(timestamp) {
+            if (this.animationStart == null) {
+                this.animationStart = timestamp;
             }
 
             var percentDone =
-                Math.min(((timestamp - Conjugate.animationStart) / Conjugate.timeout) * 100, 100);
-            document.getElementById('timerguts').style.width = (100 - percentDone) + "%";
+                Math.min(((timestamp - this.animationStart) / Conjugate.timeout) * 100, 100);
+            this.timerFillElement.style.width = (100 - percentDone) + "%";
 
             if (percentDone == 100) {
-                Conjugate.checkConjugation();
+                this.checkConjugation();
                 return;
             }
 
-            Conjugate.animationFrame = requestAnimationFrame(animationFrameFunction);
+            this.animationFrame = requestAnimationFrame(this.animationHandler);
+        }.bind(this);
 
-        };
-
-        Conjugate.animationStart = null;
-        Conjugate.animationFrame = requestAnimationFrame(animationFrameFunction);
-        Conjugate.inTestingMode = true;
+        this.animationStart = null;
+        this.animationFrame = requestAnimationFrame(this.animationHandler);
+        this.inTestingMode = true;
     }
 
-    static stopTesting() {
-        if (Conjugate.animationFrame !== null)
-            cancelAnimationFrame(Conjugate.animationFrame);
-        Conjugate.inTestingMode = false;
+    animationTick() {
+
     }
 
-    static chooseNewConjugation() {
+    stopTesting() {
+        if (this.animationFrame !== null)
+            cancelAnimationFrame(this.animationFrame);
+        this.inTestingMode = false;
+    }
+
+    chooseNewConjugation() {
         var conjugationTest = Conjugate.generateRandomConjugationTest();
         while (conjugationTest.conjugatedVerb == '') {
             conjugationTest = Conjugate.generateRandomConjugationTest();
         }
 
-        document.getElementById('word').innerText = conjugationTest.verb;
-        document.getElementById('definition').innerText = "(" + conjugationTest.definition + ")";
-        document.getElementById('conjugation').innerHTML =
+        this.wordElement.innerText = conjugationTest.verb;
+        this.definitionElement.innerText = "(" + conjugationTest.definition + ")";
+        this.conjugationTextElement.innerHTML =
             conjugationTest.tense +
             "<br/>" + conjugationTest.mood +
             "<br/>in the " + conjugationTest.personAndNumberText + " form";
         window.__ANSWER__ = conjugationTest.conjugatedVerb;
         console.log(conjugationTest.conjugatedVerb);
 
-        var inputBox = document.getElementById('inputbox');
-        inputBox.innerText = "";
-        inputBox.style.display = "";
-        inputBox.className = "wordbox noanswer";
-        inputBox.setAttribute('contenteditable', 'true');
-        inputBox.focus();
+        this.inputBoxElement.innerText = "";
+        this.inputBoxElement.className = "wordbox noanswer";
+        this.inputBoxElement.setAttribute('contenteditable', 'true');
+        this.inputBoxElement.focus();
 
-        var answerBox = document.getElementById('answerbox');
-        answerBox.innerText = "blank";
-        answerBox.style.visibility = "hidden";
+        this.correctAnswerBoxElement.innerText = "blank";
+        this.correctAnswerBoxElement.style.visibility = "hidden";
 
-        Conjugate.startTesting();
+        this.startTesting();
     }
 
-    static checkConjugation() {
-        var inputBox = document.getElementById('inputbox');
-        var answerBox = document.getElementById('answerbox');
-
-        if (inputBox.innerText == __ANSWER__)
-            inputBox.className = "wordbox correct phaseout";
+    checkConjugation() {
+        if (this.inputBoxElement.innerText == __ANSWER__)
+            this.inputBoxElement.className = "wordbox correct phaseout";
         else {
-            inputBox.className = "wordbox incorrect phaseout";
-            answerBox.innerText = __ANSWER__;
-            answerBox.style.visibility = "";
+            this.inputBoxElement.className = "wordbox incorrect phaseout";
+            this.correctAnswerBoxElement.innerText = __ANSWER__;
+            this.correctAnswerBoxElement.style.visibility = "";
         }
-        inputBox.removeAttribute('contenteditable');
+        this.inputBoxElement.removeAttribute('contenteditable');
 
-        Conjugate.stopTesting();
+        this.stopTesting();
     }
 
     static getEvent(event) {
@@ -101,16 +121,16 @@ class Conjugate {
         return event;
     }
 
-    static keyPress(event) {
+    keyPress(event) {
         var event = Conjugate.getEvent(event);
         if (event.keyCode == 13) {
             event.preventDefault();
             event.stopPropagation();
 
-            if (Conjugate.inTestingMode) {
-                Conjugate.checkConjugation();
+            if (this.inTestingMode) {
+                this.checkConjugation();
             } else {
-                Conjugate.chooseNewConjugation();
+                this.chooseNewConjugation();
             }
         }
 
@@ -118,18 +138,18 @@ class Conjugate {
     }
 
     static start() {
-        var inputBox = document.getElementById('inputbox');
-        inputBox.addEventListener("keypress", Conjugate.keyPress, false);
-        document.body.addEventListener("keypress", Conjugate.keyPress, false);
-        Conjugate.chooseNewConjugation();
+        var conjugation = new Conjugate(
+            document.getElementById('inputbox'),
+            document.getElementById('answerbox'),
+            document.getElementById('word'),
+            document.getElementById('definition'),
+            document.getElementById('conjugation'),
+            document.getElementById('timerguts'));
+        conjugation.chooseNewConjugation();
     }
 }
 
-Conjugate.inTestingMode = false;
-Conjugate.animationFrame = null;
-Conjugate.animationStart = null;
 Conjugate.timeout = 5 * 1000; // 5 seconds
-
 Conjugate.moodsAndTenses = [
     [0, "Present", "Indicative"],
     [1, "Future", "Indicative"],

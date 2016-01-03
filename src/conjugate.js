@@ -1,8 +1,136 @@
-var __TIMEOUT__ = 5 * 1000; // 5 seconds
-var __ANIMATION_FRAME__ = null;
-var __ANIMATION_START__ = null;
+class Conjugate {
+    static generateRandomConjugationTest() {
+        var keys = Object.keys(__WORDS__);
+        var verb = keys[Math.floor(Math.random() * keys.length)];
+        var verbArray = __WORDS__[verb];
+        var moodAndTenseIndex = Math.floor(Math.random() * Conjugate.moodsAndTenses.length);
+        var personAndNumberIndex = Math.floor(Math.random() * Conjugate.personAndNumber.length);
 
-var __MOODS_AND_TENSES__ = [
+        return {
+            verb: verb,
+            definition: verbArray[0],
+            conjugatedVerb: verbArray[1 + (Conjugate.moodsAndTenses[moodAndTenseIndex][0] * 6) +
+                                          Conjugate.personAndNumber[personAndNumberIndex][0]],
+            tense: Conjugate.moodsAndTenses[moodAndTenseIndex][1],
+            mood: Conjugate.moodsAndTenses[moodAndTenseIndex][2],
+            personAndNumberText: Conjugate.personAndNumber[personAndNumberIndex][1],
+        }
+    }
+
+    static startTesting() {
+        if (Conjugate.animationFrame !== null)
+            cancelAnimationFrame(Conjugate.animationFrame);
+
+        var animationFrameFunction = function(timestamp) {
+            if (Conjugate.animationStart == null) {
+                Conjugate.animationStart = timestamp;
+            }
+
+            var percentDone =
+                Math.min(((timestamp - Conjugate.animationStart) / Conjugate.timeout) * 100, 100);
+            document.getElementById('timerguts').style.width = (100 - percentDone) + "%";
+
+            if (percentDone == 100) {
+                Conjugate.checkConjugation();
+                return;
+            }
+
+            Conjugate.animationFrame = requestAnimationFrame(animationFrameFunction);
+
+        };
+
+        Conjugate.animationStart = null;
+        Conjugate.animationFrame = requestAnimationFrame(animationFrameFunction);
+        Conjugate.inTestingMode = true;
+    }
+
+    static stopTesting() {
+        if (Conjugate.animationFrame !== null)
+            cancelAnimationFrame(Conjugate.animationFrame);
+        Conjugate.inTestingMode = false;
+    }
+
+    static chooseNewConjugation() {
+        var conjugationTest = Conjugate.generateRandomConjugationTest();
+        while (conjugationTest.conjugatedVerb == '') {
+            conjugationTest = Conjugate.generateRandomConjugationTest();
+        }
+
+        document.getElementById('word').innerText = conjugationTest.verb;
+        document.getElementById('definition').innerText = "(" + conjugationTest.definition + ")";
+        document.getElementById('conjugation').innerHTML =
+            conjugationTest.tense +
+            "<br/>" + conjugationTest.mood +
+            "<br/>in the " + conjugationTest.personAndNumberText + " form";
+        window.__ANSWER__ = conjugationTest.conjugatedVerb;
+        console.log(conjugationTest.conjugatedVerb);
+
+        var inputBox = document.getElementById('inputbox');
+        inputBox.innerText = "";
+        inputBox.style.display = "";
+        inputBox.className = "wordbox noanswer";
+        inputBox.setAttribute('contenteditable', 'true');
+        inputBox.focus();
+
+        var answerBox = document.getElementById('answerbox');
+        answerBox.innerText = "blank";
+        answerBox.style.visibility = "hidden";
+
+        Conjugate.startTesting();
+    }
+
+    static checkConjugation() {
+        var inputBox = document.getElementById('inputbox');
+        var answerBox = document.getElementById('answerbox');
+
+        if (inputBox.innerText == __ANSWER__)
+            inputBox.className = "wordbox correct phaseout";
+        else {
+            inputBox.className = "wordbox incorrect phaseout";
+            answerBox.innerText = __ANSWER__;
+            answerBox.style.visibility = "";
+        }
+        inputBox.removeAttribute('contenteditable');
+
+        Conjugate.stopTesting();
+    }
+
+    static getEvent(event) {
+        if (!event)
+            return window.event;
+        return event;
+    }
+
+    static keyPress(event) {
+        var event = Conjugate.getEvent(event);
+        if (event.keyCode == 13) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (Conjugate.inTestingMode) {
+                Conjugate.checkConjugation();
+            } else {
+                Conjugate.chooseNewConjugation();
+            }
+        }
+
+        return false;
+    }
+
+    static start() {
+        var inputBox = document.getElementById('inputbox');
+        inputBox.addEventListener("keypress", Conjugate.keyPress, false);
+        document.body.addEventListener("keypress", Conjugate.keyPress, false);
+        Conjugate.chooseNewConjugation();
+    }
+}
+
+Conjugate.inTestingMode = false;
+Conjugate.animationFrame = null;
+Conjugate.animationStart = null;
+Conjugate.timeout = 5 * 1000; // 5 seconds
+
+Conjugate.moodsAndTenses = [
     [0, "Present", "Indicative"],
     [1, "Future", "Indicative"],
     [2, "Imperfect", "Indicative"],
@@ -23,7 +151,7 @@ var __MOODS_AND_TENSES__ = [
     [17, "Negative", "Imperative"],
 ];
 
-var __PERSON_AND_NUMBER__ = [
+Conjugate.personAndNumber = [
     [0, "yo"],
     [1, "tú"],
     [2, "él/ella/usted"],
@@ -31,138 +159,3 @@ var __PERSON_AND_NUMBER__ = [
     [4, "vosotros"],
     [5, "ellos/ellas/ustedes" ],
 ];
-
-function generateRandomConjugationTest() {
-    var keys = Object.keys(__WORDS__);
-    var verb = keys[Math.floor(Math.random() * keys.length)];
-    var verbArray = __WORDS__[verb];
-    var moodAndTenseIndex = Math.floor(Math.random() * __MOODS_AND_TENSES__.length);
-    var personAndNumberIndex = Math.floor(Math.random() * __PERSON_AND_NUMBER__.length);
-
-    return {
-        verb: verb,
-        definition: verbArray[0],
-        conjugatedVerb: verbArray[1 + (__MOODS_AND_TENSES__[moodAndTenseIndex][0] * 6) +
-                                      __PERSON_AND_NUMBER__[personAndNumberIndex][0]],
-        tense: __MOODS_AND_TENSES__[moodAndTenseIndex][1],
-        mood: __MOODS_AND_TENSES__[moodAndTenseIndex][2],
-        personAndNumberText: __PERSON_AND_NUMBER__[personAndNumberIndex][1],
-    }
-}
-
-function startTesting() {
-    if (__ANIMATION_FRAME__ !== null)
-        cancelAnimationFrame(__ANIMATION_FRAME__);
-
-    var animationFrameFunction = function(timestamp) {
-        if (__ANIMATION_START__ == null) {
-            __ANIMATION_START__ = timestamp;
-        }
-
-        var percentDone =
-            Math.min(((timestamp - __ANIMATION_START__) / __TIMEOUT__) * 100, 100);
-        document.getElementById('timerguts').style.width = (100 - percentDone) + "%";
-
-        if (percentDone == 100) {
-            checkConjugation();
-            return;
-        }
-
-        __ANIMATION_FRAME__ = requestAnimationFrame(animationFrameFunction);
-
-    };
-
-    __ANIMATION_START__ = null;
-    __ANIMATION_FRAME__ = requestAnimationFrame(animationFrameFunction);
-    inTestingMode = true;
-}
-
-function stopTesting() {
-    if (__ANIMATION_FRAME__ !== null)
-        cancelAnimationFrame(__ANIMATION_FRAME__);
-    inTestingMode = false;
-}
-
-function chooseNewConjugation() {
-    var conjugationTest = generateRandomConjugationTest();
-    while (conjugationTest.conjugatedVerb == '') {
-        conjugationTest = generateRandomConjugationTest();
-    }
-
-    document.getElementById('word').innerText = conjugationTest.verb;
-    document.getElementById('definition').innerText = "(" + conjugationTest.definition + ")";
-    document.getElementById('conjugation').innerHTML =
-        conjugationTest.tense +
-        "<br/>" + conjugationTest.mood +
-        "<br/>in the " + conjugationTest.personAndNumberText + " form";
-    window.__ANSWER__ = conjugationTest.conjugatedVerb;
-    console.log(conjugationTest.conjugatedVerb);
-
-    var inputBox = document.getElementById('inputbox');
-    inputBox.innerText = "";
-    inputBox.style.display = "";
-    inputBox.className = "wordbox noanswer";
-    inputBox.setAttribute('contenteditable', 'true');
-    inputBox.focus();
-
-    var answerBox = document.getElementById('answerbox');
-    answerBox.innerText = "blank";
-    answerBox.style.visibility = "hidden";
-
-    startTesting();
-}
-
-function checkConjugation() {
-    var inputBox = document.getElementById('inputbox');
-    var answerBox = document.getElementById('answerbox');
-
-    if (inputBox.innerText == __ANSWER__)
-        inputBox.className = "wordbox correct phaseout";
-    else {
-        inputBox.className = "wordbox incorrect phaseout";
-        answerBox.innerText = __ANSWER__;
-        answerBox.style.visibility = "";
-    }
-    inputBox.removeAttribute('contenteditable');
-
-    stopTesting();
-}
-
-function getEvent(event) {
-    if (!event)
-        return window.event;
-    return event;
-}
-
-function getEventTarget(event) {
-    var event = getEvent(event);
-    if (event.target)
-        return event.target;
-    else if (event.srcElement)
-        return event.srcElement;
-    return null;
-}
-
-function keyPress(event) {
-    var event = getEvent(event);
-    if (event.keyCode == 13) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (inTestingMode) {
-            checkConjugation();
-        } else {
-            chooseNewConjugation();
-        }
-    }
-
-    return false;
-}
-
-function start() {
-    var inputBox = document.getElementById('inputbox');
-    inputBox.addEventListener("keypress", keyPress, false);
-    document.body.addEventListener("keypress", keyPress, false);
-    chooseNewConjugation();
-}
-

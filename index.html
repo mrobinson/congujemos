@@ -34,98 +34,8 @@
 
     <script type="text/javascript" src="data.json" charset="utf-8"></script>
     <script type="text/javascript" src="lib/conjugate.js" charset="utf-8"></script>
-
-    <link href='https://fonts.googleapis.com/css?family=Fjalla+One&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-    <style>
-    body {
-        background: url(img/background.jpg), black;
-        font-family: "Fjalla One", san-serif;
-        color: white;
-    }
-
-    body {
-        margin-top: 5vh;
-        margin-left: 5vw;
-        margin-right: 5vw;
-    }
-
-    #main {
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    #word { font-size: 6vw; }
-    #definition { font-size: 1.5vw; }
-    #conjugation {
-        font-size: 4vw;
-        text-align: right;
-    }
-
-    .wordbox {
-        font-size: 6vw;
-        outline: none;
-    }
-
-    #inputbox {
-        border-radius: 0.5ex;
-        margin-top: 1ex;
-        margin-bottom: 0.1ex;
-        padding: 0.2ex;
-        padding-left: 0.4ex;
-        padding-right: 0.4ex;
-        min-height: 2ex;
-    }
-
-    #answerbox {
-        color: lightgray;
-        font-style: italic;
-        text-align: right;
-        text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
-    }
-
-    #hearts {
-        margin-top: 1ex;
-        text-align: right;
-    }
-
-    .heart {
-        width: 15vh;
-        height: 15vh;
-    }
-
-    @keyframes entered {
-        0% {
-            transform: scale(1.0);
-        }
-
-        100% {
-            transform: scale(1.01);
-        }
-    }
-
-    .phaseout {
-        animation-name: entered;
-        animation-duration: 0.1s;
-        animation-direction: alternate;
-        animation-timing-function: ease;
-    }
-
-    .noanswer {
-        border: solid rgb(20, 61, 102) 5pt;
-        background-color: rgb(51, 153, 255);
-    }
-
-    .incorrect {
-        border: solid rgb(102, 30, 0) 5pt;
-        background-color: rgb(255, 50, 50);
-    }
-
-    .correct {
-        border: solid rgb(30, 102, 0) 5pt;
-        background-color: rgb(71, 209, 71);
-    }
-
-    </style>
+    <link href="https://fonts.googleapis.com/css?family=Fjalla+One&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <link href="style.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -148,6 +58,12 @@
         <div id="timer" style="width: 300px; height: 20px; border: solid black 3px;">
             <div id="timerguts" style="width: 50%; height: 100%; background: pink;"></div>
         </div>
+
+        <div style="flaot: right;" onclick="Conjugate.showOptions();">Options</div>
+    </div>
+
+    <div id="options_wrapper">
+        <div id="options"></div>
     </div>
 
     <script>

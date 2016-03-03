@@ -1,0 +1,147 @@
+body {
+    background: url(img/background.jpg), black;
+    font-family: "Fjalla One", san-serif;
+    color: white;
+}
+
+body {
+    margin-top: 5vh;
+    margin-left: 5vw;
+    margin-right: 5vw;
+}
+
+#main {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#word { font-size: 6vw; }
+#definition { font-size: 1.5vw; }
+#conjugation {
+    font-size: 4vw;
+    text-align: right;
+}
+
+.wordbox {
+    font-size: 6vw;
+    outline: none;
+}
+
+#inputbox {
+    border-radius: 0.5ex;
+    margin-top: 1ex;
+    margin-bottom: 0.1ex;
+    padding: 0.2ex;
+    padding-left: 0.4ex;
+    padding-right: 0.4ex;
+    min-height: 2ex;
+}
+
+#answerbox {
+    color: lightgray;
+    font-style: italic;
+    text-align: right;
+    text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
+}
+
+#hearts {
+    margin-top: 1ex;
+    text-align: right;
+}
+
+.heart {
+    width: 15vh;
+    height: 15vh;
+}
+
+@keyframes entered {
+    0% {
+        transform: scale(1.0);
+    }
+
+    100% {
+        transform: scale(1.01);
+    }
+}
+
+.phaseout {
+    animation-name: entered;
+    animation-duration: 0.1s;
+    animation-direction: alternate;
+    animation-timing-function: ease;
+}
+
+.noanswer {
+    border: solid rgb(20, 61, 102) 5pt;
+    background-color: rgb(51, 153, 255);
+}
+
+.incorrect {
+    border: solid rgb(102, 30, 0) 5pt;
+    background-color: rgb(255, 50, 50);
+}
+
+.correct {
+    border: solid rgb(30, 102, 0) 5pt;
+    background-color: rgb(71, 209, 71);
+}
+
+#options_wrapper {
+    display: none;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+
+    /* Center in the viewport. */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%)
+}
+
+#options {
+    margin: 0 auto;
+    width: 60vw;
+    background: white;
+    color: black;
+    border-radius: 1vw;
+    padding: 2vw;
+
+    /* Center in the viewport. */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%)
+}
+
+#options .moods_and_tenses {
+    margin: 0 auto;
+    text-align: center;
+}
+
+#options .mood_section {
+    font-size: 2vw;
+    text-align: left;
+    vertical-align: text-top;
+    display: inline-block;
+    margin-left: 2vw;
+    margin-right: 2vw;
+}
+
+#options .mood_section h2 {
+    margin-bottom: 0.vh;
+    margin-top: 1vh;
+}
+
+#options .mood_section input[type=checkbox] {
+    transform: scale(1.5);
+}
+
+#options input[type=button] {
+    font-size: 3vw;
+    font-weight: bold;
+    float: right;
+}

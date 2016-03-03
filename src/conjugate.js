@@ -1,10 +1,82 @@
+class Options {
+    constructor(elementToHideAndShow, container) {
+        this.elementToHideAndShow = elementToHideAndShow;
+        this.container = container;
+        this.activeMoodsAndTenses = Array(Conjugate.moodsAndTenses.length);
+        this.activeMoodsAndTenses.fill(true);
+        this.timeout = 20 * 1000; // 20 seconds
+
+        this.buildOptionsDialog();
+    }
+
+    moodAndTenseChanged(index, event) {
+        var event = Conjugate.getEvent(event);
+        this.activeMoodsAndTenses[index] = event.target.checked;
+    }
+
+    hide() {
+        this.elementToHideAndShow.style.display = "none";
+    }
+
+    show() {
+        this.elementToHideAndShow.style.display = "block";
+    }
+
+    buildOptionsDialog() {
+        var self = this;
+        function addMood(mood) {
+            var outerDiv = document.createElement('div');
+            outerDiv.className = "mood_section";
+
+            var header = document.createElement("h2");
+            header.innerText = mood;
+            outerDiv.appendChild(header);
+
+            Conjugate.moodsAndTenses.forEach(function(moodAndTense, index) {
+                if (moodAndTense[2] != mood) {
+                    return;
+                }
+
+                var check = document.createElement('input');
+                check.type = 'checkbox';
+                if (self.activeMoodsAndTenses[index])
+                    check.checked = 'true';
+
+                check.addEventListener("change", self.moodAndTenseChanged.bind(self, index));
+
+                outerDiv.appendChild(check);
+                outerDiv.appendChild(document.createTextNode(moodAndTense[1]));
+
+                outerDiv.appendChild(document.createElement('br'));
+            });
+            return outerDiv;
+        }
+
+        var moodAndTensesContainer = document.createElement('div');
+        moodAndTensesContainer.className = "mood_and_tenses";
+        moodAndTensesContainer.appendChild(addMood("Indicative"));
+        moodAndTensesContainer.appendChild(addMood("Subjunctive"));
+        moodAndTensesContainer.appendChild(addMood("Imperative"));
+        this.container.appendChild(moodAndTensesContainer);
+
+        var closeButton = document.createElement("input");
+        closeButton.type = "button";
+        closeButton.value = "Close";
+        closeButton.addEventListener("click", self.hide.bind(self));
+        this.container.appendChild(closeButton);
+    }
+}
+
 class Conjugate {
-    constructor(inputBoxElement,
+    constructor(options,
+                inputBoxElement,
                 correctAnswerBoxElement,
                 wordElement,
                 definitionElement,
                 conjugationTextElement,
                 timerFillElement) {
+
+        this.options = options;
 
         this.inputBoxElement = inputBoxElement;
         this.correctAnswerBoxElement = correctAnswerBoxElement;
@@ -22,11 +94,19 @@ class Conjugate {
         document.body.addEventListener("keypress", keyHandler, false);
     }
 
-    static generateRandomConjugationTest() {
+    generateRandomConjugationTest() {
         var keys = Object.keys(__WORDS__);
         var verb = keys[Math.floor(Math.random() * keys.length)];
         var verbArray = __WORDS__[verb];
-        var moodAndTenseIndex = Math.floor(Math.random() * Conjugate.moodsAndTenses.length);
+
+        var moodAndTenseIndices = [];
+        this.options.activeMoodsAndTenses.forEach(function(active, index) {
+            if (active)
+                moodAndTenseIndices.push(index);
+        });
+        var moodAndTenseIndex =
+            moodAndTenseIndices[Math.floor(Math.random() * moodAndTenseIndices.length)];
+
         var personAndNumberIndex = Math.floor(Math.random() * Conjugate.personAndNumber.length);
 
         return {
@@ -77,9 +157,9 @@ class Conjugate {
     }
 
     chooseNewConjugation() {
-        var conjugationTest = Conjugate.generateRandomConjugationTest();
+        var conjugationTest = this.generateRandomConjugationTest();
         while (conjugationTest.conjugatedVerb == '') {
-            conjugationTest = Conjugate.generateRandomConjugationTest();
+            conjugationTest = this.generateRandomConjugationTest();
         }
 
         this.wordElement.innerText = conjugationTest.verb;
@@ -138,18 +218,25 @@ class Conjugate {
     }
 
     static start() {
-        var conjugation = new Conjugate(
+        var options = new Options(document.getElementById('options_wrapper'),
+                                  document.getElementById('options'));
+        Conjugate.__instance__ = new Conjugate(
+            options,
             document.getElementById('inputbox'),
             document.getElementById('answerbox'),
             document.getElementById('word'),
             document.getElementById('definition'),
             document.getElementById('conjugation'),
             document.getElementById('timerguts'));
-        conjugation.chooseNewConjugation();
+        Conjugate.__instance__.chooseNewConjugation();
+    }
+
+    static showOptions() {
+        Conjugate.__instance__.options.show();
     }
 }
 
-Conjugate.timeout = 5 * 1000; // 5 seconds
+Conjugate.timeout = 20 * 1000; // 5 seconds
 Conjugate.moodsAndTenses = [
     [0, "Present", "Indicative"],
     [1, "Future", "Indicative"],
@@ -166,7 +253,7 @@ Conjugate.moodsAndTenses = [
     [12, "Future", "Subjunctive"],
     [13, "Present Perfect", "Subjunctive"],
     [14, "Future Perfect", "Subjunctive"],
-    [15, "Past Perfect", "Subjuntive"],
+    [15, "Past Perfect", "Subjunctive"],
     [16, "Affirmative", "Imperative"],
     [17, "Negative", "Imperative"],
 ];

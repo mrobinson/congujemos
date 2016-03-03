@@ -2,10 +2,11 @@
   "name": "conjuguemos",
   "version": "0.0.1",
   "devDependencies": {
-    "babel-cli": "^6.0.0"
+    "babel-cli": "^6.0.0",
+    "babel-preset-es2015": "^6.0.0"
   },
   "scripts": {
-    "build": "babel src -d lib"
+    "build": "babel src -d lib --source-maps=inline"
   },
   "babel": {
     "presets": ["es2015"]

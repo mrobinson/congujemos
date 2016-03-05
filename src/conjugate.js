@@ -2,9 +2,17 @@ class Options {
     constructor(elementToHideAndShow, container) {
         this.elementToHideAndShow = elementToHideAndShow;
         this.container = container;
-        this.activeMoodsAndTenses = Array(Conjugate.moodsAndTenses.length);
-        this.activeMoodsAndTenses.fill(true);
-        this.timeout = 20 * 1000; // 20 seconds
+
+        this.read();
+
+        if (!this.activeMoodsAndTenses) {
+            this.activeMoodsAndTenses = Array(Conjugate.moodsAndTenses.length);
+            this.activeMoodsAndTenses.fill(true);
+        }
+
+        if (!this.timeout) {
+            this.timeout = 20 * 1000; // 20 seconds
+        }
 
         this.buildOptionsDialog();
     }
@@ -16,6 +24,7 @@ class Options {
 
     hide() {
         this.elementToHideAndShow.style.display = "none";
+        this.write();
     }
 
     show() {
@@ -64,6 +73,31 @@ class Options {
         closeButton.value = "Close";
         closeButton.addEventListener("click", self.hide.bind(self));
         this.container.appendChild(closeButton);
+    }
+
+    write() {
+        localStorage.setItem("activeMoodsAndTenses", JSON.stringify(this.activeMoodsAndTenses));
+        localStorage.setItem("timeout", JSON.stringify(this.timeout));
+    }
+
+    read() {
+        function readAndTryToParse(key) {
+            var value = localStorage.getItem(key);
+            if (!value)
+                return null;
+            try {
+                return JSON.parse(value);
+            } catch (error) {
+                return null;
+            }
+        }
+
+        var activeMoodsAndTenses = readAndTryToParse("activeMoodsAndTenses");
+        if (activeMoodsAndTenses)
+            this.activeMoodsAndTenses = activeMoodsAndTenses;
+        var timeout = readAndTryToParse("timeout");
+        if (timeout)
+            this.timeout = timeout;
     }
 }
 

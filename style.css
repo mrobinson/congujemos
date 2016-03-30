@@ -15,12 +15,21 @@ body {
     margin-right: auto;
 }
 
-#word { font-size: 6vw; }
-#definition { font-size: 1.5vw; }
+#round_title { font-size: 6vw; }
+#round_subtitle { font-size: 1.5vw; }
+
 #conjugation {
+    width: 30vw;
     font-size: 4vw;
-    text-align: right;
+    text-align: left;
+    padding: 0.5vw;
+    padding-bottom: 2vw;
+    border-radius: 0.5ex;
 }
+
+#conjugation.noanswer { background: rgb(20, 61, 102); }
+#conjugation.incorrect { background: rgb(102, 30, 0); }
+#conjugation.correct { background: rgb(30, 102, 0); }
 
 .wordbox {
     font-size: 6vw;
@@ -29,12 +38,15 @@ body {
 
 #inputbox {
     border-radius: 0.5ex;
-    margin-top: 1ex;
+    margin-top: 0vw;
     margin-bottom: 0.1ex;
     padding: 0.2ex;
     padding-left: 0.4ex;
     padding-right: 0.4ex;
     min-height: 2ex;
+
+    position: relative;
+    z-index: 1;
 }
 
 #answerbox {
@@ -71,24 +83,23 @@ body {
     animation-timing-function: ease;
 }
 
-.noanswer {
+.wordbox.noanswer {
     border: solid rgb(20, 61, 102) 5pt;
     background-color: rgb(51, 153, 255);
 }
 
-.incorrect {
+.wordbox.incorrect {
     border: solid rgb(102, 30, 0) 5pt;
     background-color: rgb(255, 50, 50);
 }
 
-.correct {
+.wordbox.correct {
     border: solid rgb(30, 102, 0) 5pt;
     background-color: rgb(71, 209, 71);
 }
 
-#options_wrapper {
-    display: none;
-    z-index: 1;
+.dialog_wrapper {
+    z-index: 2;
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.8);
@@ -101,9 +112,8 @@ body {
     transform: translate(-50%, -50%)
 }
 
-#options {
+.dialog {
     margin: 0 auto;
-    width: 60vw;
     background: white;
     color: black;
     border-radius: 1vw;
@@ -115,6 +125,48 @@ body {
     left: 50%;
     margin-right: -50%;
     transform: translate(-50%, -50%)
+}
+
+#round_dialog {
+    text-align: center;
+    font-size: 3vw;
+    padding: 0;
+    background: #ff3030;
+    padding-bottom: 2vw;
+}
+
+#round_dialog h1 {
+    font-size: 10vw;
+    margin: 0;
+    color: white;
+}
+
+#round_dialog div {
+    background: white;
+    padding: 2vw;
+}
+
+#round_dialog h2 {
+    font-size: 7vw;
+    margin: 0;
+}
+
+#round_dialog h3 {
+    margin: 0;
+    margin-bottom: 2vw;
+    font-size: 7vw;
+}
+
+#round_dialog input[type=button] {
+    transform: scale(2);
+}
+
+#options_wrapper {
+    display: none;
+}
+
+#options {
+    width: 60vw;
 }
 
 #options .moods_and_tenses {

@@ -40,12 +40,12 @@
 
 <body>
     <div id="main">
-        <div style="float: left">
-            <div id="word"></div>
-            <div id="definition"></div>
+        <div style="float: right">
+            <div id="round_title"></div>
+            <div id="round_subtitle"></div>
         </div>
-        <div style="float: right;" id="conjugation">none</div>
         <div style="clear: both;"></div>
+        <div> <span id="conjugation">none</span> </div>
         <div id="inputbox" class="wordbox noanswer" contenteditable></div>
         <div id="answerbox" class="wordbox"></div>
 
@@ -62,8 +62,12 @@
         <div style="flaot: right;" onclick="Conjugate.showOptions();">Options</div>
     </div>
 
-    <div id="options_wrapper">
-        <div id="options"></div>
+    <div class="dialog_wrapper" id="round_dialog_wrapper">
+        <div class="dialog" id="round_dialog"></div>
+    </div>
+
+    <div class="dialog_wrapper" id="options_wrapper">
+        <div class="dialog" id="options"></div>
     </div>
 
     <script>

@@ -14,7 +14,7 @@ indices = [
     "Indicativo-Presente perfecto",
     "Indicativo-Futuro perfecto",
     "Indicativo-Pluscuamperfecto",
-    "Indicativo-Pretérito anterior",
+#    "Indicativo-Pretérito anterior",
     "Indicativo-Condicional perfecto",
     "Subjuntivo-Presente",
     "Subjuntivo-Imperfecto",
@@ -32,13 +32,16 @@ with open(sys.argv[1], 'r') as csv_file:
 
     next(reader) # Skip the header.
     for row in reader:
+        if row[4] == "Pretérito anterior":
+            continue
+
         offset = indices.index(row[2] + "-" + row[4]) * 6
         for index in range(0, 6):
             # The imperative forms are in a very strange order. Correct
             # that here.
-            if (offset == 16*6 or offset == 17*6) and index == 2:
+            if (offset == 15*6 or offset == 16*6) and index == 2:
                target = 7 + 4
-            elif (offset == 16*6 or offset == 17*6) and index == 4:
+            elif (offset == 15*6 or offset == 16*6) and index == 4:
                target = 7 + 2
             else:
                target = 7 + index

@@ -42,7 +42,7 @@ class Options {
             outerDiv.appendChild(header);
 
             Conjugate.moodsAndTenses.forEach(function(moodAndTense, index) {
-                if (moodAndTense[2] != mood) {
+                if (!moodAndTense.includes(mood)) {
                     return;
                 }
 
@@ -109,34 +109,22 @@ class Round {
         var verb = Round.randomVerb();
         var verbArray = __WORDS__[verb];
 
-        var moodAndTenseIndex = this.randomMoodAndTenseIndex();
-        var tense = Conjugate.moodsAndTenses[moodAndTenseIndex][1];
-        var mood = Conjugate.moodsAndTenses[moodAndTenseIndex][2];
+        var moodAndTense = this.randomMoodAndTense();
         this.title = verb;
-        this.subtitle = mood + " " + tense;
+        this.subtitle = moodAndTense;
 
         this.conjugations = [];
         var shuffledPersonAndNumber = Conjugate.shuffledPersonAndNumber();
-        var shuffledPersonAndNumber = shuffledPersonAndNumber.filter(function(element) {
-            var personAndNumberIndex = element[0];
-            var answer = verbArray[1 + (Conjugate.moodsAndTenses[moodAndTenseIndex][0] * 6) +
-                                        Conjugate.personAndNumber[personAndNumberIndex][0]]
-            return answer != "";
+        var shuffledPersonAndNumber = shuffledPersonAndNumber.filter(function(personAndNumber) {
+            return Conjugate.getConjugation(verb, moodAndTense, personAndNumber) != "";
         });
 
         var totalConjugations = 3;
         for (var i = 0; i < totalConjugations && i < shuffledPersonAndNumber.length; i++) {
-            this.conjugations.push(Round.generateConjugation(verbArray,
-                                                             shuffledPersonAndNumber[i][0],
-                                                             moodAndTenseIndex));
-        }
-    }
-
-    static generateConjugation(verbArray, personAndNumberIndex, moodAndTenseIndex) {
-        return {
-            prompt: Conjugate.personAndNumber[personAndNumberIndex][1],
-            answer: verbArray[1 + (Conjugate.moodsAndTenses[moodAndTenseIndex][0] * 6) +
-                                   Conjugate.personAndNumber[personAndNumberIndex][0]],
+            this.conjugations.push({
+                prompt: shuffledPersonAndNumber[i],
+                answer: Conjugate.getConjugation(verb, moodAndTense, shuffledPersonAndNumber[i]),
+            });
         }
     }
 
@@ -145,13 +133,13 @@ class Round {
         return keys[Math.floor(Math.random() * keys.length)];
     }
 
-    randomMoodAndTenseIndex() {
-        var moodAndTenseIndices = [];
+    randomMoodAndTense() {
+        var moodsAndTenses = [];
         this.options.activeMoodsAndTenses.forEach(function(active, index) {
             if (active)
-                moodAndTenseIndices.push(index);
+                moodsAndTenses.push(Conjugate.moodsAndTenses[index]);
         });
-        return moodAndTenseIndices[Math.floor(Math.random() * moodAndTenseIndices.length)];
+        return moodsAndTenses[Math.floor(Math.random() * moodsAndTenses.length)];
     }
 
     nextConjugation() {
@@ -370,45 +358,52 @@ class Conjugate {
     static showOptions() {
         Conjugate.__instance__.options.show();
     }
+
+    static getConjugation(verb, moodAndTense, personAndNumber) {
+        var verbArray = __WORDS__[verb];
+        var moodAndTenseIndex = Conjugate.moodsAndTenses.indexOf(moodAndTense);
+        var personAndNumberIndex = Conjugate.personAndNumber.indexOf(personAndNumber);
+        return verbArray[1 + (moodAndTenseIndex * 6) + personAndNumberIndex];
+    }
+
+    static shuffledPersonAndNumber() {
+        var shuffledArray = Conjugate.personAndNumber.slice();
+        for (var i = shuffledArray.length - 1; i >= 0; i--) {
+            var indexToSwap = Math.floor(Math.random() * i);
+            var temp = shuffledArray[i];
+            shuffledArray[i] = shuffledArray[indexToSwap];
+            shuffledArray[indexToSwap] = temp;
+        }
+        return shuffledArray;
+    }
 }
 
 Conjugate.timeout = 20 * 1000; // 5 seconds
 Conjugate.moodsAndTenses = [
-    [0, "Present", ""],
-    [1, "Future", ""],
-    [2, "Imperfect", ""],
-    [3, "Preterite", ""],
-    [4, "Conditional", ""],
-    [5, "Present Perfect", ""],
-    [6, "Future Perfect", ""],
-    [7, "Past Perfect", ""],
-    [8, "Conditional Perfect", ""],
-    [9, "Present", "Subjunctive"],
-    [10, "Imperfect", "Subjunctive"],
-    [11, "Future", "Subjunctive"],
-    [12, "Present Perfect", "Subjunctive"],
-    [13, "Future Perfect", "Subjunctive"],
-    [14, "Past Perfect", "Subjunctive"],
-    [15, "Affirmative", "Imperative"],
-    [16, "Negative", "Imperative"],
+    "Present",
+    "Future",
+    "Imperfect",
+    "Preterite",
+    "Conditional",
+    "Present Perfect",
+    "Future Perfect",
+    "Past Perfect",
+    "Conditional Perfect",
+    "Present Subjunctive",
+    "Imperfect Subjunctive",
+    "Future Subjunctive",
+    "Present Perfect Subjunctive",
+    "Future Perfect Subjunctive",
+    "Past Perfect Subjunctive",
+    "Affirmative Imperative",
+    "Negative Imperative",
 ];
 
 Conjugate.personAndNumber = [
-    [0, "yo"],
-    [1, "tú"],
-    [2, "él/ella/Ud."],
-    [3, "nosotros"],
-    [4, "vosotros"],
-    [5, "ellos/ellas/Uds." ],
+    "yo",
+    "tú",
+    "él/ella/Ud.",
+    "nosotros",
+    "vosotros",
+    "ellos/ellas/Uds." ,
 ];
-
-Conjugate.shuffledPersonAndNumber = function() {
-    var shuffledArray = Conjugate.personAndNumber.slice();
-    for (var i = shuffledArray.length - 1; i >= 0; i--) {
-        var indexToSwap = Math.floor(Math.random() * i);
-        var temp = shuffledArray[i];
-        shuffledArray[i] = shuffledArray[indexToSwap];
-        shuffledArray[indexToSwap] = temp;
-    }
-    return shuffledArray;
-}
